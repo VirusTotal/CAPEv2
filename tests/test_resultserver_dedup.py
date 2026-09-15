@@ -1,4 +1,3 @@
-import hashlib
 import io
 import json
 import os
@@ -91,10 +90,7 @@ def test_resultserver_dedup_and_versioning():
     task_id = 999991
     with tempfile.TemporaryDirectory() as storagepath:
         payload_a = b"hello world payload A"
-        sha256_a = hashlib.sha256(payload_a).hexdigest()
-
         payload_b = b"different content payload B"
-        sha256_b = hashlib.sha256(payload_b).hexdigest()
 
         # 1. First upload of test.bin
         _upload_file(
