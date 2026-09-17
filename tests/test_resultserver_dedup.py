@@ -299,8 +299,13 @@ def test_watchdownloads_event_handler_moved_and_dedup(monkeypatch):
         assert len(uploaded) == 1
 
 
-def test_cape_processing_without_magika_config():
+def test_cape_processing_without_magika_config(monkeypatch):
     """Verify CAPE processing module handles deduplicated dropped files when [magika] config is absent."""
+    for mod in ("pymongo", "pymongo.errors", "bson", "bson.objectid"):
+        try:
+            __import__(mod)
+        except ImportError:
+            monkeypatch.setitem(sys.modules, mod, MagicMock())
     from lib.cuckoo.common.config import Config
     import modules.processing.CAPE as cape_mod
     import lib.cuckoo.common.integrations.file_extra_info as fei_mod
@@ -308,8 +313,11 @@ def test_cape_processing_without_magika_config():
     proc_cfg = Config("processing")
     if hasattr(proc_cfg, "magika"):
         delattr(proc_cfg, "magika")
-    cape_mod.processing_conf = proc_cfg
-    fei_mod.processing_conf = proc_cfg
+    monkeypatch.setattr(cape_mod, "processing_conf", proc_cfg)
+    monkeypatch.setattr(fei_mod, "processing_conf", proc_cfg)
+    monkeypatch.setattr(cape_mod, "static_file_info", lambda *a, **kw: None)
+    monkeypatch.setattr(cape_mod.File, "get_yara", lambda self, category=None: [])
+    monkeypatch.setattr("lib.cuckoo.common.objects.get_clamav", lambda path: [])
 
     with tempfile.TemporaryDirectory() as tmpdir:
         files_dir = os.path.join(tmpdir, "files")
