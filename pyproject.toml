@@ -15,7 +15,7 @@ dependencies = [
     "Pebble==5.1.0",
     # "pymisp==2.4.144",
     "cryptography>=44.0.1",
-    "requests[security,socks]==2.32.4",
+    "requests[security,socks]==2.33.0",
     # "pyOpenSSL==24.0.0",
     "pefile",
     "tldextract>=5.1.2",
